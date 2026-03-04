@@ -18,19 +18,27 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/home">Home</a>
                     </li>
-                    <!-- <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li> -->
+                     <li class="nav-item">
+                        <a class="nav-link" href="#">Comment</a>
+                    </li> 
                 </ul>
             </div>
             <div>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                    <span class="navbar-text me-3">
+                        Hello, {{ user.username }}!
+                    <li class="nav-item">
+                        <form method="post" action="/logout/" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-link nav-link active">Logout</button>
+                        </form>
+                    </li>
+                    {% else %}
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/login">Login</a>
                     </li>
-                    <!-- <li class="nav-item">
-                                    <a class="nav-link" href="#">About</a>
-                                </li> -->
+                   {% endif %}
                 </ul>
             </div>
         </div>
