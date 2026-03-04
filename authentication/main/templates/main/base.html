@@ -16,11 +16,18 @@
             <div>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/home/">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="/create_comment/">Comment</a>
-                    </li> 
+                    {% if user.is_authenticated and user.profile.role == 'student' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_weekly_log' %}">Create Weekly Log</a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_authenticated and user.profile.role == 'internship_admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'create_user_account' %}">Create User</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
             <div>
@@ -36,7 +43,7 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="/login">Login</a>
+                        <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
                     </li>
                    {% endif %}
                 </ul>

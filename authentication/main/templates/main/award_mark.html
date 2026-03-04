@@ -1,0 +1,16 @@
+{% extends "main/base.html" %} {% load crispy_forms_tags %} {% block title%}Award Mark{% endblock %} {% block content %}
+<div class="container mt-4">
+  <h2>Award Mark</h2>
+  <p><strong>Student:</strong> {{ weekly_log.student.username }}</p>
+  <p>
+    <strong>Log:</strong> {{ weekly_log.title }} (Week of {{
+    weekly_log.week_start }})
+  </p>
+  <p>{{ weekly_log.content }}</p>
+
+  <form method="post">
+    {% csrf_token %} {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Save Mark</button>
+  </form>
+</div>
+{% endblock %}

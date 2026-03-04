@@ -1,46 +1,133 @@
-{% extends "main/base.html" %} {% block title %}Home{% endblock %} 
+{% extends "main/base.html" %} {% block title %}Dashboard{% endblock %} 
 {% block content %}
 <div class="container mt-4">
-  <h1>Welcome to the Home Page</h1>
-  <hr />
-  <h2>Comments</h2>
-  {% if comments %}
-  <ul class="list-group">
-    {% for comment in comments %}
-    <div class="card mt-2">
-      <div class="card-header">
-        <strong>@ {{ comment.user.username }}</strong>
-      </div>
-      <div
-        class="card-body d-flex flex-row justify-content-between align-items-center"
-      >
-        <div>
-          <p class="card-text mb-0">{{ comment.content }}</p>
-          <small class="text-muted"
-            >{{ comment.created_at|date:"F j, Y, g:i a" }}</small
-          >
-        </div>
-        <div>
-          {% if user.is_authenticated and user == comment.user %}
-          <form method="post">
-            {% csrf_token %}
-            <button
-              type="submit"
-              class="btn btn-danger btn-sm"
-              name="comment_id"
-              value="{{ comment.id }}"
-            >
-              Delete
-            </button>
-          </form>
-          {% endif %}
-        </div>
-      </div>
+  <h1>Internship Dashboard</h1>
+
+  {% if messages %} {% for message in messages %}
+  <div class="alert alert-{{ message.tags|default:'info' }} mt-2">
+    {{ message }}
+  </div>
+  {% endfor %} {% endif %} {% if role == all_roles.student %}
+  <h3 class="mt-4">My Weekly Logs</h3>
+  {% if weekly_logs %}
+  <div class="list-group">
+    {% for log in weekly_logs %}
+    <div class="list-group-item">
+      <h5 class="mb-1">{{ log.title }} (Week of {{ log.week_start }})</h5>
+      <p class="mb-1">{{ log.content }}</p>
+      <small>Status: <strong>{{ log.get_status_display }}</strong></small>
     </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No weekly logs submitted yet.</p>
+  {% endif %}
+
+  <h3 class="mt-4">My Marks</h3>
+  {% if marks %}
+  <div class="list-group">
+    {% for mark in marks %}
+    <div class="list-group-item">
+      <h6 class="mb-1">
+        {{ mark.weekly_log.title }} — Score: {{ mark.score }}
+      </h6>
+      <p class="mb-0">{{ mark.feedback|default:"No feedback yet." }}</p>
+      <small>Awarded by: {{ mark.academic_supervisor.username }}</small>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No marks awarded yet.</p>
+  {% endif %} {% elif role == all_roles.workplace_supervisor %}
+  <h3 class="mt-4">Pending Weekly Logs</h3>
+  {% if pending_logs %}
+  <div class="list-group">
+    {% for log in pending_logs %}
+    <div class="list-group-item">
+      <h5 class="mb-1">{{ log.student.username }} — {{ log.title }}</h5>
+      <p class="mb-1">Week of {{ log.week_start }}</p>
+      <p class="mb-2">{{ log.content }}</p>
+      <form method="post" action="{% url 'approve_weekly_log' log.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success btn-sm">
+          Approve Weekly Log
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No pending logs to approve.</p>
+  {% endif %}
+
+  <h3 class="mt-4">Logs I Approved</h3>
+  {% if approved_logs %}
+  <ul class="list-group">
+    {% for log in approved_logs %}
+    <li class="list-group-item">
+      {{ log.student.username }} — {{ log.title }} ({{ log.week_start }})
+    </li>
     {% endfor %}
   </ul>
   {% else %}
-  <p>No comments yet.</p>
+  <p>You have not approved any logs yet.</p>
+  {% endif %} {% elif role == all_roles.academic_supervisor %}
+  <h3 class="mt-4">Approved Logs (Ready for Marking)</h3>
+  {% if approved_logs %}
+  <div class="list-group">
+    {% for log in approved_logs %}
+    <div
+      class="list-group-item d-flex justify-content-between align-items-center"
+    >
+      <div>
+        <h6 class="mb-1">{{ log.student.username }} — {{ log.title }}</h6>
+        <small>Week of {{ log.week_start }}</small>
+      </div>
+      <a href="{% url 'award_mark' log.id %}" class="btn btn-primary btn-sm"
+        >Award / Update Mark</a
+      >
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No approved logs available for marking.</p>
   {% endif %}
+
+  <h3 class="mt-4">Marks I Awarded</h3>
+  {% if awarded_marks %}
+  <ul class="list-group">
+    {% for mark in awarded_marks %}
+    <li class="list-group-item">
+      {{ mark.student.username }} — {{ mark.weekly_log.title }} — Score: {{
+      mark.score }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>You have not awarded marks yet.</p>
+  {% endif %} {% elif role == all_roles.internship_admin %}
+  <h3 class="mt-4">User Accounts</h3>
+  {% if users %}
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for profile in users %}
+      <tr>
+        <td>{{ profile.user.username }}</td>
+        <td>{{ profile.user.email }}</td>
+        <td>{{ profile.get_role_display }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No users found.</p>
+  {% endif %} {% endif %}
 </div>
 {% endblock %}
