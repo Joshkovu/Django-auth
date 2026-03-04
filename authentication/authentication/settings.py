@@ -77,11 +77,15 @@ WSGI_APPLICATION = "authentication.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "neondb",
+        "USER": "neondb_owner",
+        "PASSWORD": "npg_0MSG7vaTwPkV",
+        "HOST": "ep-broad-dew-aip0gr2w-pooler.c-4.us-east-1.aws.neon.tech",
+        "PORT": "5432",
     }
 }
-
+# postgresql://neondb_owner:npg_0MSG7vaTwPkV@ep-broad-dew-aip0gr2w-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
